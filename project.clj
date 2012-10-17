@@ -5,5 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [clj-http "0.5.5"]
-                 [twitter-api "0.6.11"]]
+                 [twitter-api "0.6.11"]
+                 [lobos "1.0.0-SNAPSHOT"]
+                 [com.h2database/h2 "1.3.160"]]
   :immutant {:swank-port 4005})

@@ -18,8 +18,7 @@
   (let [count-words-in (scrape/word-counter word)]
     (fn [url]
       (let [count (count-words-in url)]
-        (when (> count 0)
-          (log/info url ":" word "=>" count))))))
+        (log/info url ":" word "=>" count)))))
 
 (defn make-multiword-scraper
   "Returns a function that takes a url and counts matches of all

@@ -1,22 +1,17 @@
 (ns poorsmatic.core
-  (:use [poorsmatic.handlers :only [make-url-extractor make-multiword-scraper]])
-  (:require [poorsmatic tweets handlers]
+  (:require [poorsmatic.app :as app]
             [immutant.messaging :as msg]))
 
 (defn start
   "Start up the application's resources"
-  [terms]
-  (msg/start "queue/tweets")
-  (msg/start "queue/urls")
-  (def scraper (msg/listen "queue/urls" (make-multiword-scraper terms)))
-  (def url-extractor (msg/listen "queue/tweets" (make-url-extractor "queue/urls")))
-  (def daemon (poorsmatic.tweets/daemon terms #(msg/publish "queue/tweets" %))))
+  []
+  (msg/start app/tweets-endpoint)
+  (msg/start app/urls-endpoint)
+  (app/start))
 
 (defn stop
   "Cleanly shutdown the application's resources "
   []
-  (.stop daemon)
-  (msg/unlisten url-extractor)
-  (msg/unlisten scraper)
-  (msg/stop "queue/urls" :force true)
-  (msg/stop "queue/tweets" :force true))
+  (app/stop)
+  (msg/stop app/urls-endpoint :force true)
+  (msg/stop app/tweets-endpoint :force true))

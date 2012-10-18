@@ -1,7 +1,8 @@
 (ns poorsmatic.handlers
   (:require [clojure.tools.logging :as log]
             [immutant.messaging :as msg]
-            [poorsmatic.scrape :as scrape]))
+            [poorsmatic.scrape :as scrape]
+            [poorsmatic.models :as model]))
 
 (defn make-url-extractor
   "Returns a function that parses a tweet for a URL and, if found,
@@ -18,7 +19,9 @@
   (let [count-words-in (scrape/word-counter word)]
     (fn [url]
       (let [count (count-words-in url)]
-        (log/info url ":" word "=>" count)))))
+        (when (> count 0)
+          (log/info url ":" word "=>" count)
+          (model/add-url {:url url, :term word, :count count}))))))
 
 (defn make-multiword-scraper
   "Returns a function that takes a url and counts matches of all

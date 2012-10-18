@@ -3,14 +3,12 @@
             [clojure.tools.logging :as log]
             [clojure.string :as str]
             [immutant.daemons :as dmn]
-            [immutant.messaging :as msg]
+            [poorsmatic.config :as config]
             [twitter.oauth :as oauth]
             [twitter.callbacks.handlers :as handler]
             [twitter.api.streaming :as stream]
             [http.async.client :as ac])
   (:import twitter.callbacks.protocols.AsyncStreamingCallback))
-
-(def config-endpoint "/topic/configure/tweets")
 
 (def
   ^{:doc "twitter oauth credentials"
@@ -36,7 +34,7 @@
                             :oauth-creds creds
                             :callbacks callback)))
 
-(defn ^:private make-config-handler
+(defn ^:private make-observer
   [stream handler]
   (fn [terms]
     (let [stop (:cancel (meta @stream))
@@ -47,9 +45,6 @@
         (reset! stream nil)
         (reset! stream (filter-tweets filter handler))))))
 
-(defn configure [terms]
-  (msg/publish config-endpoint terms))
-
 (defn daemon
   "Start the tweets service"
   [handler]
@@ -59,12 +54,9 @@
                    (reify dmn/Daemon
                      (start [_]
                        (log/info "Starting tweets service")
-                       (msg/start config-endpoint)
-                       (reset! configurator
-                               (msg/listen config-endpoint (make-config-handler tweets handler))))
+                       (reset! configurator (config/observe (make-observer tweets handler))))
                      (stop [_]
                        (if @tweets ((:cancel (meta @tweets))))
-                       (msg/unlisten @configurator)
-                       (msg/stop config-endpoint)
+                       ((:ignore (meta @configurator)))
                        (log/info "Stopped tweets service"))))))
 

@@ -2,7 +2,7 @@
   (:use [poorsmatic.handlers :only [make-multiword-scraper make-url-extractor]])
   (:require [clojure.tools.logging :as log]
             [immutant.messaging :as msg]
-            [poorsmatic tweets models]))
+            [poorsmatic tweets models config]))
 
 (def tweets-endpoint "/queue/tweets")
 (def urls-endpoint   "/queue/urls")
@@ -22,7 +22,7 @@
   "Triggers daemon to reconfigure with new search terms"
   []
   (let [terms (poorsmatic.models/get-all-terms)]
-    (poorsmatic.tweets/configure terms)
+    (poorsmatic.config/configure terms)
     (let [scraper (msg/listen urls-endpoint (make-multiword-scraper terms))]
       (swap! application replace-listener :scraper scraper))))
 

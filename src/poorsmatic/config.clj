@@ -9,5 +9,8 @@
 
 (defn observe
   [f]
-  (let [listener (msg/listen config-endpoint f)]
-    (with-meta [listener] {:ignore (fn [] (msg/unlisten listener))})))
+  (msg/listen config-endpoint f))
+
+(defn ignore
+  [observer]
+  (msg/unlisten observer))

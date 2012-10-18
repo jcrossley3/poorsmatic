@@ -33,13 +33,15 @@
                             :client (ac/create-client :request-timeout -1) ; TODO: not this
                             :oauth-creds creds
                             :callbacks callback)))
+(defn ^:private close
+  [stream]
+  (if stream ((:cancel (meta stream)))))
 
 (defn ^:private make-observer
   [stream handler]
   (fn [terms]
-    (let [stop (:cancel (meta @stream))
-          filter (str/join "," terms)]
-      (if stop (stop))
+    (let [filter (str/join "," terms)]
+      (close @stream)
       (log/info "Tweets filter:" filter)
       (if (empty? terms)
         (reset! stream nil)
@@ -56,7 +58,7 @@
                        (log/info "Starting tweets service")
                        (reset! configurator (config/observe (make-observer tweets handler))))
                      (stop [_]
-                       (if @tweets ((:cancel (meta @tweets))))
-                       ((:ignore (meta @configurator)))
+                       (close @tweets)
+                       (config/ignore @configurator)
                        (log/info "Stopped tweets service"))))))
 

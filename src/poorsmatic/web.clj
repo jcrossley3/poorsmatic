@@ -4,7 +4,7 @@
         [compojure.handler :only [site]]
         [ring.util.response :only [redirect]])
   (:require [poorsmatic.models :as model]
-            [poorsmatic.app :as app]
+            [poorsmatic.config :as cfg]
             [immutant.web :as web]
             [immutant.xa :as xa]))
 
@@ -29,13 +29,13 @@
   [term]
   (xa/transaction
    (model/add-term term)
-   (app/reconfigure)))
+   (cfg/configure)))
 
 (defn delete
   [term]
   (xa/transaction
    (model/delete-term term)
-   (app/reconfigure)))
+   (cfg/configure)))
 
 (defroutes routes
   (GET "/" [] (home))

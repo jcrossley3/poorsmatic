@@ -1,11 +1,12 @@
 (ns poorsmatic.config
-  (:require [immutant.messaging :as msg]))
+  (:require [poorsmatic.models :as model]
+            [immutant.messaging :as msg]))
 
 (def config-endpoint "/topic/config")
 
 (defn configure
-  [v]
-  (msg/publish config-endpoint v))
+  []
+  (msg/publish config-endpoint (model/get-all-terms)))
 
 (defn observe
   [f]
@@ -14,3 +15,7 @@
 (defn ignore
   [observer]
   (msg/unlisten observer))
+
+(defn start [] (msg/start config-endpoint))
+(defn stop [] (msg/stop config-endpoint))
+

@@ -1,24 +1,63 @@
 (ns poorsmatic.core
-  (:require [poorsmatic
-             [app :as app]
+  (:require [clojure.tools.logging :as log]
+            [poorsmatic
              [web :as web]
-             [config :as cfg]]
+             [config :as cfg]
+             [tweets :as tweet]
+             [scrape :as scrape]]
             [immutant.messaging :as msg]))
 
-(defn start
-  "Start up the application's resources"
+(def tweets-endpoint "/queue/tweets")
+(def urls-endpoint   "/queue/urls")
+
+(def
+  ^{:doc "The running state of the application"
+    :private true}
+  application (atom nil))
+
+(defn ^:private url-extractor
+  "Parses a tweet for a URL and, if found, publishes it to the
+   urls-endpoint"
+  [{tweet :text}]
+  (when-let [url (and tweet (re-find #"http:[^\s]*" tweet))]
+    (log/info tweet)
+    (msg/publish urls-endpoint url)))
+
+(defn start-app
+  "Initialize application's internal state"
   []
-  (msg/start cfg/config-endpoint)
-  (msg/start app/tweets-endpoint)
-  (msg/start app/urls-endpoint)
+  (when-not @application
+    (reset! application
+            {:url-extractor
+             (msg/listen tweets-endpoint url-extractor)
+             :scraper
+             (scrape/start urls-endpoint)
+             :daemon
+             (tweet/daemon #(msg/publish tweets-endpoint %))})
+    (cfg/configure)))
+
+(defn stop-app
+  "Cleanly shutdown the application's internal resources"
+  []
+  (.stop (:daemon @application))
+  (scrape/stop (:scraper @application))
+  (msg/unlisten (:url-extractor @application))
+  (reset! application nil))
+
+(defn start
+  "Start up everything"
+  []
+  (msg/start tweets-endpoint)
+  (msg/start urls-endpoint)
+  (cfg/start)
   (web/start)
-  (app/start))
+  (start-app))
 
 (defn stop
-  "Cleanly shutdown the application's resources "
+  "Cleanly shutdown everything "
   []
-  (app/stop)
+  (stop-app)
   (web/stop)
-  (msg/stop app/urls-endpoint :force true)
-  (msg/stop app/tweets-endpoint :force true)
-  (msg/stop cfg/config-endpoint :force true))
+  (cfg/stop)
+  (msg/stop urls-endpoint :force true)
+  (msg/stop tweets-endpoint :force true))

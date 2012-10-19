@@ -7,35 +7,27 @@
              [scrape :as scrape]]
             [immutant.messaging :as msg]))
 
-(def tweets-endpoint "/queue/tweets")
-(def urls-endpoint   "/queue/urls")
+(def tweets "/queue/tweets")
+(def urls   "/queue/urls")
 
 (def
   ^{:doc "The running state of the application"
     :private true}
   application (atom nil))
 
-(defn ^:private url-extractor
-  "Parses a tweet for a URL and, if found, publishes it to the
-   urls-endpoint"
-  [{tweet :text}]
-  (when-let [url (and tweet (re-find #"http:[^\s]*" tweet))]
-    (log/info tweet)
-    (msg/publish urls-endpoint url)))
-
-(defn start-app
+(defn start-application
   "Initialize application's internal state"
   []
   (when-not @application
     (reset! application
             {:url-extractor
-             (msg/listen tweets-endpoint url-extractor)
+             (msg/listen tweets (tweet/url-extractor #(msg/publish urls %)))
              :scraper
-             (scrape/start urls-endpoint)
+             (scrape/start urls)
              :daemon
-             (tweet/daemon #(msg/publish tweets-endpoint %))})))
+             (tweet/daemon #(msg/publish tweets %))})))
 
-(defn stop-app
+(defn stop-application
   "Cleanly shutdown the application's internal resources"
   []
   (.stop (:daemon @application))
@@ -46,18 +38,19 @@
 (defn start
   "Start up everything"
   []
-  (msg/start tweets-endpoint)
-  (msg/start urls-endpoint)
+  (msg/start tweets)
+  (msg/start urls)
   (cfg/start)
   (web/start)
-  (start-app)
-  (cfg/configure))
+  (start-application)
+  (cfg/configure)
+  @application)
 
 (defn stop
   "Cleanly shutdown everything "
   []
-  (stop-app)
+  (stop-application)
   (web/stop)
   (cfg/stop)
-  (msg/stop urls-endpoint :force true)
-  (msg/stop tweets-endpoint :force true))
+  (msg/stop urls :force true)
+  (msg/stop tweets :force true))

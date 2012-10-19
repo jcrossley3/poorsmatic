@@ -5,6 +5,15 @@
             [poorsmatic.config :as config]
             [poorsmatic.twitter :as twitter]))
 
+(defn url-extractor
+  "Returns a function that parses a tweet for a URL and, if found,
+   invokes handler with it"
+  [handler]
+  (fn [{tweet :text}]
+    (when-let [url (and tweet (re-find #"http:[^\s]*" tweet))]
+      (log/info tweet)
+      (handler url))))
+
 (defn ^:private make-observer
   [stream handler]
   (fn [terms]

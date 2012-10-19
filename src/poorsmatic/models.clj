@@ -1,11 +1,13 @@
 (ns poorsmatic.models
   (:require lobos.config
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [immutant.utilities :as util])
   (:use [korma db core]
         [immutant.xa :only [datasource]]))
 
-(defonce ds (datasource "demo" {:adapter "h2" :database "file:/tmp/demo;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}))
-(defdb prod {:datasource ds})
+(when (util/in-immutant?)
+  (defonce ds (datasource "demo" {:adapter "h2" :database "file:/tmp/demo;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}))
+  (defdb prod {:datasource ds}))
 
 (defentity urls)
 (defentity terms)

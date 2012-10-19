@@ -1,5 +1,6 @@
 (ns poorsmatic.twitter
   (:require [clojure.data.json :as json]
+            [clojure.java.io :as io]
             [twitter.oauth :as oauth]
             [twitter.callbacks.handlers :as handler]
             [twitter.api.streaming :as stream]
@@ -9,7 +10,8 @@
 (def
   ^{:doc "twitter oauth credentials"
     :private true}
-  creds (apply oauth/make-oauth-creds (read-string (slurp "/tmp/creds"))))
+  creds (if (.exists (io/file "/tmp/creds"))
+          (apply oauth/make-oauth-creds (read-string (slurp "/tmp/creds")))))
 
 (defn ^:private handle
   "Process a chunk of async tweetness"

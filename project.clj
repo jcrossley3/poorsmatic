@@ -11,4 +11,5 @@
                  [com.h2database/h2 "1.3.160"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :immutant {:swank-port 4005})
+  :profiles {:dev {:immutant {:swank-port 4005}}
+             :prod {:immutant {:init poorsmatic.core/start}}})

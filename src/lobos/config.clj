@@ -6,7 +6,7 @@
 
 (open-global {:classname "org.h2.Driver"
               :subprotocol "h2"
-              :subname "file:/tmp/demo"
+              :subname "file:/tmp/demo;AUTO_SERVER=TRUE"
               :unsafe true})
 
 (binding [*src-directory* (util/app-relative "src/")]

@@ -1,7 +1,7 @@
 (ns poorsmatic.scrape
   (:refer-clojure :exclude [count])
   (:require [clj-http.client :as client]
-            [clojure.string :as s]
+            [clojure.string :as str]
             [clojure.tools.logging :as log]
             [poorsmatic.models :as model]
             [poorsmatic.config :as cfg]
@@ -16,10 +16,10 @@
 (def memoized-scrape (cache/memo scrape "scraped" :idle 10))
 
 (defn count [word text]
-  (-> (s/lower-case (or text ""))
-      (s/split #"[^\w]+")
+  (-> (str/lower-case (or text ""))
+      (str/split #"[^\w]+")
       frequencies
-      (get (s/lower-case word) 0)))
+      (get (str/lower-case word) 0)))
 
 (defn word-counter
   "Returns a function that takes a url and returns the number of
@@ -33,8 +33,8 @@
   (let [count-words-in (word-counter word)]
     (fn [url]
       (let [count (count-words-in url)]
+        (log/info url ":" word "=>" count)
         (when (> count 0)
-          (log/info url ":" word "=>" count)
           (model/add-url {:url url, :term word, :count count}))
         count))))
 
@@ -47,7 +47,7 @@
 (defn start
   [endpoint]
   (let [scraper (atom (fn [x]))
-        listener (msg/listen endpoint (fn [url] (@scraper url)))
+        listener (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)
         config (cfg/observe #(reset! scraper (make-robust-scraper %)))]
     [listener config]))
 

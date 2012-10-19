@@ -33,8 +33,7 @@
              :scraper
              (scrape/start urls-endpoint)
              :daemon
-             (tweet/daemon #(msg/publish tweets-endpoint %))})
-    (cfg/configure)))
+             (tweet/daemon #(msg/publish tweets-endpoint %))})))
 
 (defn stop-app
   "Cleanly shutdown the application's internal resources"

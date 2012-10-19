@@ -56,7 +56,8 @@
                    (reify dmn/Daemon
                      (start [_]
                        (log/info "Starting tweets service")
-                       (reset! configurator (config/observe (make-observer tweets handler))))
+                       (reset! configurator (config/observe (make-observer tweets handler)))
+                       (config/configure))
                      (stop [_]
                        (close @tweets)
                        (config/ignore @configurator)

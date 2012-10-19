@@ -4,7 +4,7 @@
   (:use [korma db core]
         [immutant.xa :only [datasource]]))
 
-(defonce ds (datasource "demo" {:adapter "h2" :database "file:/tmp/demo;AUTO_SERVER=TRUE"}))
+(defonce ds (datasource "demo" {:adapter "h2" :database "file:/tmp/demo;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}))
 (defdb prod {:datasource ds})
 
 (defentity urls)

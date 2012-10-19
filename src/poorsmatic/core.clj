@@ -50,7 +50,8 @@
   (msg/start urls-endpoint)
   (cfg/start)
   (web/start)
-  (start-app))
+  (start-app)
+  (cfg/configure))
 
 (defn stop
   "Cleanly shutdown everything "

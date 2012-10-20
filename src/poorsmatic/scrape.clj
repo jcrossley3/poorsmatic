@@ -8,37 +8,47 @@
             [immutant.messaging :as msg]
             [immutant.cache :as cache]))
 
-(defn scrape [url]
+(defn scrape*
+  "Returns a hashed response given a url"
+  [url]
   (try
     (log/info "Fetching" url)
     (time (client/get url {:socket-timeout 10000 :conn-timeout 10000}))
     (catch Exception e {})))
-(def memoized-scrape (cache/memo scrape "scraped" :idle 10))
+(def scrape (cache/memo scrape* "scraped" :idle 10))
 
-(defn count [word text]
-  (-> (str/lower-case (or text ""))
-      (str/split #"[^\w]+")
-      frequencies
-      (get (str/lower-case word) 0)))
-
-(defn word-counter
-  "Returns a function that takes a url and returns the number of
-   matches for 'word' in its content"
+(defn counter
+  "Adds a :count to the response"
   [word]
-  (comp (partial count word) :body memoized-scrape))
+  (fn [m]
+    (assoc m :count (-> (str/lower-case (:body m ""))
+                        (str/split #"[^\w]+")
+                        frequencies
+                        (get (str/lower-case word) 0)))))
+
+(defn title
+  "Adds a :title to the response"
+  [m]
+  (assoc m :title (last (re-find #"<title>(.*?)</title>" (:body m "")))))
+
+(defn url
+  "Adds a :url to the response"
+  [m]
+  (assoc m :url (last (:trace-redirects m))))
 
 (defn make-scraper
   "Returns a function that, given a url, counts the number of words in its content"
   [word]
-  (let [count-words-in (word-counter word)]
+  (let [scrape (comp (counter word) title url scrape)]
     (fn [url]
-      (let [count (count-words-in url)]
-        (log/info url ":" word "=>" count)
+      (let [v (scrape url)
+            count (:count v)]
+        (log/info word "=>" count (str "\"" (:title v) "\""))
         (when (> count 0)
-          (model/add-url {:url url, :term word, :count count}))
-        count))))
+          (model/add-url (assoc v :term word)))
+        v))))
 
-(defn make-robust-scraper
+(defn make-scrapers
   [words]
   (if (empty? words)
     (fn [x])
@@ -48,7 +58,7 @@
   [endpoint]
   (let [scraper (atom (fn [x]))
         listener (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)
-        config (cfg/observe #(reset! scraper (make-robust-scraper %)))]
+        config (cfg/observe #(reset! scraper (make-scrapers %)))]
     [listener config]))
 
 (defn stop

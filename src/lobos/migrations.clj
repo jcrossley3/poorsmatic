@@ -5,13 +5,14 @@
 (defmigration add-terms-table
   (up [] (create (table :terms
                         (integer :id :primary-key :auto-inc)
-                        (varchar :term 50))))
+                        (varchar :term 128))))
   (down [] (drop (table :terms))))
 
 (defmigration add-urls-table
   (up [] (create (table :urls
                         (integer :id :primary-key :auto-inc)
-                        (varchar :url 100)
-                        (varchar :term 50)
+                        (varchar :term 128)
+                        (varchar :url 1024)
+                        (varchar :title 1024)
                         (integer :count))))
   (down [] (drop (table :urls ))))

@@ -28,7 +28,7 @@
 
 (defn add-url
   [attrs]
-  (insert urls (values attrs)))
+  (insert urls (values (select-keys attrs [:term :url :title :count]))))
 
 (defn find-urls-by-term
   [term]

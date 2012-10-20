@@ -22,8 +22,8 @@
        [:span.term term]
        (form-to [:post (str "/delete/" term)] (submit-button "delete"))
        [:table
-        (for [{:keys [url count]} (model/find-urls-by-term term)]
-          [:tr [:td count] [:td (link-to url url)]])]])]))
+        (for [{:keys [url title count]} (model/find-urls-by-term term)]
+          [:tr [:td count] [:td (link-to url (or title url))]])]])]))
 
 (defn add
   [term]

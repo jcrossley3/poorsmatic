@@ -6,7 +6,7 @@
         [immutant.xa :only [datasource]]))
 
 (when (util/in-immutant?)
-  (defonce ds (datasource "demo" {:adapter "h2" :database "file:/tmp/demo;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}))
+  (defonce ds (datasource "demo" {:adapter "h2" :database lobos.config/connection-url}))
   (defdb prod {:datasource ds}))
 
 (defentity urls)

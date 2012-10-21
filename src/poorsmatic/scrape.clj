@@ -11,7 +11,7 @@
   (let [scrape (comp (counter word) title url scrape)]
     (fn [url]
       (let [v (scrape url)]
-        (log/info word "=>" (:count v) (str "\"" (:title v) "\""))
+        (log/info word "=>" (:count v))
         (when (> (:count v) 0)
           (model/add-url (assoc v :term word)))
         v))))

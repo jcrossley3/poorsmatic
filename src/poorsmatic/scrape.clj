@@ -9,7 +9,7 @@
   "Returns a function that, given a url, counts the number of words in
    its content, among other things"
   [word]
-  (let [scrape (comp (counter word) title url scrape)]
+  (let [scrape (comp (counter word) title url (saver "/tmp/corpus/urls/") scrape)]
     (fn [url]
       (let [v (scrape url)]
         (log/info word "=>" (:count v))
@@ -28,7 +28,7 @@
   "Scrape urls looking for words received from the configuration topic"
   [endpoint]
   (let [scraper (atom (fn [x]))
-        listener (msg/listen endpoint (fn [url] (@scraper url)))
+        listener (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)
         config (cfg/observe #(reset! scraper (make-scrapers %)))]
     [listener config]))
 

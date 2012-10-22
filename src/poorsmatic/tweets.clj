@@ -9,10 +9,16 @@
   "Returns a function that parses a tweet for a URL and, if found,
    invokes handler with it"
   [handler]
-  (fn [{tweet :text}]
-    (when-let [url (and tweet (re-find #"http:[^\s]*" tweet))]
-      (log/info tweet)
+  (fn [{text :text :as tweet}]
+    (when-let [url (and text (re-find #"http://[\w/.-]+" text))]
+      (log/info text)
       (handler url))))
+
+(defn saver
+  [path]
+  (fn [tweet]
+    (spit (str path (:id_str tweet)) tweet)
+    tweet))
 
 (defn ^:private make-observer
   [stream handler]

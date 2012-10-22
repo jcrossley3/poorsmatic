@@ -21,7 +21,8 @@
   (when-not @application
     (reset! application
             {:url-extractor
-             (msg/listen tweets (tweet/url-extractor #(msg/publish urls %)))
+             (msg/listen tweets
+                         (comp (tweet/url-extractor #(msg/publish urls %)) (tweet/saver "/tmp/corpus/tweets/")))
              :scraper
              (scrape/start urls)
              :daemon

@@ -10,7 +10,7 @@
   (try
     (log/info "Fetching" url)
     (time (client/get url {:socket-timeout 10000 :conn-timeout 10000}))
-    (catch Exception e {})))
+    (catch Exception e (log/warn (str e)) {})))
 (def scrape (cache/memo scrape* "scraped" :idle 10))
 
 (defn counter
@@ -31,3 +31,10 @@
   "Adds a :url to the response"
   [m]
   (assoc m :url (last (:trace-redirects m))))
+
+(defn saver
+  [path]
+  (fn [m]
+    (if-let [url (first (:trace-redirects m))]
+      (spit (str path (clj-http.util/url-encode url)) m))
+    m))

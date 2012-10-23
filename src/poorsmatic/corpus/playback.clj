@@ -1,15 +1,20 @@
 (ns poorsmatic.corpus.playback
   (:refer-clojure :exclude (get))
   (:require [clojure.java.io :as io]
+            [clojure.string :as str]
             [clj-http.util :as util]))
 
 (def corpus-path "/tmp/corpus")
 
 (defn filter-tweets
   [filter callback]
-  (future (doseq [f (sort (.listFiles (io/file corpus-path "tweets")))]
-            (Thread/sleep (rand-int 500))
-            (callback (read-string (slurp f))))))
+  (if (not-empty filter)
+    (let [terms (str/split filter #",")]
+      (future (doseq [f (cycle (.listFiles (io/file corpus-path "tweets")))]
+                (let [s (slurp f)]
+                  (if (some #(.contains s %) terms)
+                    (callback (read-string s))))
+                (Thread/sleep (rand-int 500)))))))
 
 (defn close
   [stream]

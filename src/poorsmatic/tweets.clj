@@ -14,12 +14,6 @@
       (log/info text)
       (handler url))))
 
-(defn saver
-  [path]
-  (fn [tweet]
-    (spit (str path (:id_str tweet)) tweet)
-    tweet))
-
 (defn ^:private make-observer
   [stream handler]
   (fn [terms]
@@ -40,7 +34,7 @@
                      (start [_]
                        (log/info "Starting tweets service")
                        (reset! configurator (config/observe (make-observer tweets handler)))
-                       (config/configure))
+                       (config/notify))
                      (stop [_]
                        (twitter/close @tweets)
                        (config/ignore @configurator)

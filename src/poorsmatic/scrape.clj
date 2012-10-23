@@ -9,7 +9,7 @@
   "Returns a function that, given a url, counts the number of words in
    its content, among other things"
   [word]
-  (let [scrape (comp (counter word) title url (saver "/tmp/corpus/urls/") scrape)]
+  (let [scrape (comp (counter word) title url scrape)]
     (fn [url]
       (let [v (scrape url)]
         (log/info word "=>" (:count v))

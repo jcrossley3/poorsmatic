@@ -4,7 +4,7 @@
 
 (def config-endpoint "/topic/config")
 
-(defn configure
+(defn notify
   []
   (msg/publish config-endpoint (model/get-all-terms)))
 

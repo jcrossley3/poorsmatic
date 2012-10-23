@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [immutant.daemons :as dmn]
             [poorsmatic.config :as config]
-            [poorsmatic.twitter :as twitter]))
+            [poorsmatic.corpus.playback :as twitter]))
 
 (defn url-extractor
   "Returns a function that parses a tweet for a URL and, if found,

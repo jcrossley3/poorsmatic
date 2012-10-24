@@ -11,10 +11,10 @@
   (if (not-empty filter)
     (let [terms (str/split filter #",")]
       (future (doseq [f (cycle (.listFiles (io/file corpus-path "tweets")))]
-                (let [s (slurp f)]
-                  (if (some #(.contains s %) terms)
-                    (callback (read-string s))))
-                (Thread/sleep (rand-int 500)))))))
+                (let [tweet (read-string (slurp f))]
+                  (when (some #(re-find (re-pattern (str "(?i)\\b" % "\\b")) (:text tweet)) terms)
+                    (callback tweet)
+                    (Thread/sleep (rand-int 500)))))))))
 
 (defn close
   [stream]

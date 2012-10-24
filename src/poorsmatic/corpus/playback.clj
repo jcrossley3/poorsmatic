@@ -9,16 +9,21 @@
 (defn filter-tweets
   [filter callback]
   (if (not-empty filter)
-    (let [terms (str/split filter #",")]
-      (future (doseq [f (cycle (.listFiles (io/file corpus-path "tweets")))]
-                (let [tweet (read-string (slurp f))]
-                  (when (some #(re-find (re-pattern (str "(?i)\\b" % "\\b")) (:text tweet)) terms)
-                    (callback tweet)
-                    (Thread/sleep (rand-int 500)))))))))
+    (let [terms (str/split filter #",")
+          done (atom false)]
+      (with-meta
+        (future (loop [files (cycle (.listFiles (io/file corpus-path "tweets")))]
+                  (let [tweet (read-string (slurp (first files)))]
+                    (when (some #(re-find (re-pattern (str "(?i)\\b" % "\\b")) (:text tweet)) terms)
+                      (callback tweet)
+                      (Thread/sleep (rand-int 1000)))
+                    (if-not @done (recur (rest files))))))
+        {:done done}))))
 
 (defn close
   [stream]
-  (and stream (future-cancel stream)))
+  (when stream
+    (reset! (:done (meta stream)) true)))
 
 (defn get
   [url options]

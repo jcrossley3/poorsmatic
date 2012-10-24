@@ -4,7 +4,8 @@
              [web :as web]
              [config :as cfg]
              [tweets :as tweet]
-             [scrape :as scrape]]
+             [scrape :as scrape]
+             [models :as model]]
             [immutant.messaging :as msg]))
 
 (def tweets "/queue/tweets")
@@ -38,6 +39,7 @@
 (defn start
   "Start up everything"
   []
+  (model/setup-db)
   (msg/start tweets)
   (msg/start urls)
   (cfg/start)

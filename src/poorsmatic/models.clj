@@ -28,7 +28,8 @@
 
 (defn add-url
   [attrs]
-  (if (empty? (select urls (where (= :url (:url attrs)))))
+  (if (empty? (select urls (where (and (= :url (:url attrs))
+                                       (= :term (:term attrs))))))
     (insert urls (values (select-keys attrs [:term :url :title :count])))))
 
 (defn find-urls-by-term

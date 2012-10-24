@@ -1,5 +1,5 @@
 (ns poorsmatic.http
-  (:require [poorsmatic.corpus.playback :as client]
+  (:require [clj-http.client :as client]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [immutant.cache :as cache]))

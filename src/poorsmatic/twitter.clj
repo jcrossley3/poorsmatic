@@ -24,6 +24,7 @@
 (defn filter-tweets
   "Invoke a twitter-api streaming connection for a comma-delimited statuses filter string"
   [filter handler]
+  (if-not creds (throw (Exception. "Missing /tmp/creds [app-key app-secret user-token user-token-secret]")))
   (let [callback (AsyncStreamingCallback. (handle handler)
                                           (comp println handler/response-return-everything)
                                           handler/exception-print)]

@@ -18,21 +18,28 @@
   :db/ident :url/url
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
-  :db/unique :db.unique/identity
+  :db/unique :db.unique/value
   :db/doc "The actual URL"
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id [:db.part/db]
-  :db/ident :url/count
-  :db/valueType :db.type/long
-  :db/cardinality :db.cardinality/one
-  :db/doc "A count of term matches in the url's content"
+  :db/ident :url/term
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "The url's terms"
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id [:db.part/db]
-  :db/ident :url/term
+  :db/ident :term-count/term
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
-  :db/doc "The url's term"
+  :db/doc "A term in a url's term/count tuple"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :term-count/count
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "A count in a url's term/count tuple"
   :db.install/_attribute :db.part/db}
  ]

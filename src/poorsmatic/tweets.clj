@@ -17,12 +17,12 @@
 (defn ^:private make-observer
   [stream handler]
   (fn [terms]
-    (let [filter (str/join "," terms)]
-      (twitter/close @stream)
+    (let [filter (str/join "," terms)
+          old @stream]
       (log/info "Tweets filter:" filter)
-      (if (empty? terms)
-        (reset! stream nil)
-        (reset! stream (twitter/filter-tweets filter handler))))))
+      (reset! stream (if (not-empty terms)
+                       (twitter/filter-tweets filter handler)))
+      (twitter/close old))))
 
 (defn daemon
   "Start the tweets service"

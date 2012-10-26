@@ -2,7 +2,7 @@
   (:require [poorsmatic
              [web :as web]
              [config :as cfg]
-             [tweets :as tweet]
+             [tweet-urls :as tweeter]
              [scrape :as scrape]]
             [immutant.messaging :as msg]))
 
@@ -17,7 +17,7 @@
   {:scraper
    (scrape/start urls)
    :daemon
-   (tweet/daemon #(msg/publish urls %))})
+   (tweeter/daemon #(msg/publish urls %))})
 
 (defn stop
   "Cleanly shutdown everything "

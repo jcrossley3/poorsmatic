@@ -1,4 +1,4 @@
-(ns poorsmatic.tweets
+(ns poorsmatic.tweet-urls
   (:require [clojure.tools.logging :as log]
             [clojure.string :as str]
             [immutant.daemons :as dmn]
@@ -15,6 +15,7 @@
       (handler url))))
 
 (defn ^:private make-observer
+  "Respond to configuration changes (new search terms)"
   [stream handler]
   (fn [terms]
     (let [filter (str/join "," terms)
@@ -25,13 +26,13 @@
       (twitter/close old))))
 
 (defn daemon
-  "Start the tweets service"
+  "Start service that filters tweets for urls"
   [handler]
   (let [tweets (atom nil)
         configurator (atom nil)
         extractor (url-extractor handler)]
     (dmn/daemonize
-     "tweets"
+     "tweet-urls"
      (reify dmn/Daemon
        (start [_]
          (log/info "Starting tweets service")

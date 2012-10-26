@@ -17,5 +17,5 @@
   (msg/unlisten observer))
 
 (defn start [] (msg/start config-endpoint))
-(defn stop [] (msg/stop config-endpoint))
+(defn stop [] (msg/stop config-endpoint :force true))
 

@@ -30,6 +30,7 @@
   (let [scraper (atom (fn [x]))
         listener (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)
         config (cfg/observe #(reset! scraper (make-scrapers %)))]
+    (cfg/notify)
     [listener config]))
 
 (defn stop

@@ -1,8 +1,8 @@
 (ns poorsmatic.corpus.record
   (:require [clojure.java.io :as io]
             [poorsmatic.twitter :as twitter]
-            [poorsmatic.tweets :as tweets]
-            [poorsmatic.http :as http]
+            [poorsmatic.producer :as tweets]
+            [poorsmatic.scraper :as http]
             [immutant.messaging :as msg]))
 
 (defn tweet-saver

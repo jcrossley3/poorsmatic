@@ -2,8 +2,8 @@
   (:require [poorsmatic
              [web :as web]
              [config :as cfg]
-             [tweet-urls :as tweeter]
-             [scrape :as scrape]]
+             [producer :as producer]
+             [consumer :as consumer]]
             [immutant.messaging :as msg]))
 
 (def urls "/queue/urls")
@@ -15,15 +15,15 @@
   (cfg/start)
   (web/start)
   {:scraper
-   (scrape/start urls)
+   (consumer/start urls)
    :daemon
-   (tweeter/daemon #(msg/publish urls %))})
+   (producer/daemon #(msg/publish urls %))})
 
 (defn stop
   "Cleanly shutdown everything "
   [{:keys [scraper daemon]}]
   (.stop daemon)
-  (scrape/stop scraper)
+  (consumer/stop scraper)
   (web/stop)
   (cfg/stop)
   (msg/stop urls :force true))

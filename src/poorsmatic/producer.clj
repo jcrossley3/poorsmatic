@@ -1,4 +1,4 @@
-(ns poorsmatic.tweet-urls
+(ns poorsmatic.producer
   (:require [clojure.tools.logging :as log]
             [clojure.string :as str]
             [immutant.daemons :as dmn]

@@ -7,12 +7,8 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.immutant/immutant "0.5.0"]
                  [clj-http "0.5.5"]
+                 [com.datomic/datomic-free "0.8.3551"]
                  [twitter-api "0.6.11"]
-                 [org.clojars.jcrossley3/korma "1.0.0-SNAPSHOT"
-                  :exclusions [[org.clojure/java.jdbc]]]
-                 [lobos "1.0.0-SNAPSHOT"
-                  :exclusions [[org.clojure/java.jdbc]]]
-                 [com.h2database/h2 "1.3.160"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
   :profiles {:dev {:immutant {:swank-port 4005}}

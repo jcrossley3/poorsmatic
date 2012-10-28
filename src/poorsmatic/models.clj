@@ -1,40 +1,68 @@
 (ns poorsmatic.models
-  (:require lobos.config
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
+            [clojure.java.io :as io]
             [immutant.utilities :as util])
-  (:use [korma db core]
-        [immutant.xa :only [datasource]]))
+  (:use [datomic.api :only (q db transact) :as d]))
 
-(when (util/in-immutant?)
-  (defonce ds (datasource "demo" {:adapter "h2" :database lobos.config/connection-url}))
-  (defdb prod {:datasource ds}))
+;; mem uri: "datomic:mem://poorsmatic"
+(let [uri "datomic:free://localhost:4334/poorsmatic"]
+  (d/create-database uri)
+  (defonce conn (d/connect uri)))
 
-(defentity urls)
-(defentity terms)
+(defn setup-db []
+  (transact conn (read-string (slurp (io/resource "schema.dtm")))))
 
-(defn add-term
-  [term]
-  (let [t (str/lower-case term)]
-    (if (empty? (select terms (where (= :term t))))
-      (insert terms (values {:term t})))))
+(defn add-term  [term]
+  (d/transact
+   conn
+   [{:db/id #db/id [:db.part/user]
+     :tweet/term (str/lower-case term)}]))
 
 (defn delete-term
   [term]
-  (delete terms (where (= :term (str/lower-case term)))))
+  (if-let [tid (ffirst (q '[:find ?e :in $ ?term :where
+                            [?e :tweet/term ?term]]
+                          (db conn)
+                          (str/lower-case term)))]
+    (transact conn [[:db.fn/retractEntity tid]])))
 
 (defn get-all-terms
   []
-  (map :term (select terms)))
+  (->> (q '[:find ?term ?t :in $ :where
+            [?t :tweet/term ?term]] (db conn))
+       (sort-by last)
+       (map first)))
 
 (defn add-url
-  [attrs]
-  (if (empty? (select urls (where (and (= :url (:url attrs))
-                                       (= :term (:term attrs))))))
-    (insert urls (values (select-keys attrs [:term :url :title :count])))))
+  [{:keys [term url title count]}]
+  (let [count-id (d/tempid :db.part/user)
+        base-url {:db/id #db/id [:db.part/user]
+                  :url/term count-id
+                  :url/url url}]
+    (transact
+     conn
+     [{:db/id count-id
+       :term-count/term (str/lower-case term)
+       :term-count/count count}
+      (if-let [url-id (ffirst
+                       (q '[:find ?e :in $ ?url :where [?e :url/url ?url]]
+                          (db conn) url))]
+        {:db/id url-id :url/term count-id}
+        (if title
+          (assoc base-url :url/title title)
+          base-url))])))
 
 (defn find-urls-by-term
   [term]
-  (select urls
-          (where (= :term (str/lower-case term)))
-          (limit 10)
-          (order :count :DESC)))
+  (->> (q '[:find ?url ?title ?count
+            :in $ ?term
+            :where
+            [?u :url/term ?t]
+            [?t :term-count/term ?term]
+            [?u :url/url ?url]
+            [?u :url/title ?title]
+            [?t :term-count/count ?count]]
+          (db conn)
+          (str/lower-case term))
+       (sort-by #(nth % 2) >)
+       (take 10)))

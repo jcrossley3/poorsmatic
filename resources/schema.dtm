@@ -1,0 +1,45 @@
+[
+ {:db/id #db/id [:db.part/db]
+  :db/ident :tweet/term
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/identity
+  :db/doc "A search term"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :url/title
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "The title of a url"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :url/url
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/unique :db.unique/value
+  :db/doc "The actual URL"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :url/term
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "The url's terms"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :term-count/term
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "A term in a url's term/count tuple"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :term-count/count
+  :db/valueType :db.type/long
+  :db/cardinality :db.cardinality/one
+  :db/doc "A count in a url's term/count tuple"
+  :db.install/_attribute :db.part/db}
+ ]

@@ -3,7 +3,7 @@
              [web :as web]
              [config :as cfg]
              [producer :as producer]
-             [consumer :as consumer]]
+             [consumer :as consumer]
              [models :as model]]
             [immutant.messaging :as msg]))
 

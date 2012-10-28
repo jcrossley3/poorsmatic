@@ -5,12 +5,11 @@
   (:use [datomic.api :only (q db transact) :as d]))
 
 ;; mem uri: "datomic:mem://poorsmatic"
-(let [uri "datomic:free://localhost:4334/poorsmatic"]
-  (d/create-database uri)
-  (defonce conn (d/connect uri)))
-
-(defn setup-db []
-  (transact conn (read-string (slurp (io/resource "schema.dtm")))))
+(defn setup-db [& [uri]]
+  (let [uri (or uri "datomic:free://localhost:4334/poorsmatic")]
+    (d/create-database uri)
+    (defonce conn (d/connect uri))
+    (transact conn (read-string (slurp (io/resource "schema.dtm"))))))
 
 (defn add-term  [term]
   (d/transact

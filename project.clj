@@ -7,8 +7,8 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.immutant/immutant "0.5.0"]
                  [clj-http "0.5.5"]
-                 [twitter-api "0.6.11"]
                  [com.datomic/datomic-free "0.8.3551"]
+                 [twitter-api "0.6.11"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
   :profiles {:dev {:immutant {:swank-port 4005}}

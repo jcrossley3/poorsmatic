@@ -12,5 +12,7 @@
                  [twitter-api "0.6.11"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :profiles {:dev {:immutant {:swank-port 4005}}
-             :prod {:immutant {:init poorsmatic.core/start}}})
+  :profiles {:dev {:immutant {:swank-port 4005}
+                   :datomic-uri "datomic:mem://poorsmatic"}
+             :prod {:immutant {:init poorsmatic.core/start}
+                    :datomic-uri "datomic:free://localhost:4334/poorsmatic"}})

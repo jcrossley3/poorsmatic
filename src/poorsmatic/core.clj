@@ -3,8 +3,7 @@
              [web :as web]
              [config :as cfg]
              [producer :as producer]
-             [consumer :as consumer]
-             [models :as model]]
+             [consumer :as consumer]]
             [immutant.messaging :as msg]))
 
 (def urls "/queue/urls")
@@ -12,7 +11,6 @@
 (defn start
   "Start up everything"
   []
-  (model/setup-db)
   (msg/start urls)
   (cfg/start)
   (web/start)
@@ -23,9 +21,9 @@
 
 (defn stop
   "Cleanly shutdown everything "
-  [{:keys [scraper daemon]}]
-  (.stop daemon)
-  (consumer/stop scraper)
+  [& {:keys [scraper daemon]}]
+  (if daemon (.stop daemon))
+  (if scraper (consumer/stop scraper))
   (web/stop)
   (cfg/stop)
   (msg/stop urls :force true))

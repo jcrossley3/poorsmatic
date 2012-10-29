@@ -1,17 +1,16 @@
 (ns poorsmatic.models
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]
-            [immutant.utilities :as util])
-  (:use [datomic.api :only (q db transact) :as d]))
+            [clojure.java.io :as io])
+  (:use [datomic.api :only (q db transact) :as d]
+        [immutant.registry :only (fetch)]))
 
-;; mem uri: "datomic:mem://poorsmatic"
-(defn setup-db [& [uri]]
-  (let [uri (or uri "datomic:free://localhost:4334/poorsmatic")]
-    (d/create-database uri)
-    (defonce conn (d/connect uri))
-    (transact conn (read-string (slurp (io/resource "schema.dtm"))))))
+(when-let [uri (:datomic-uri (fetch :project))]
+  (d/create-database uri)
+  (defonce conn (d/connect uri))
+  (transact conn (read-string (slurp (io/resource "schema.dtm")))))
 
-(defn add-term  [term]
+(defn add-term
+  [term]
   (d/transact
    conn
    [{:db/id #db/id [:db.part/user]

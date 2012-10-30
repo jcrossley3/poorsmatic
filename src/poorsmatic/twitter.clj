@@ -7,12 +7,12 @@
             [http.async.client :as ac])
   (:import twitter.callbacks.protocols.AsyncStreamingCallback))
 
-;;; [app-key app-secret user-token user-token-secret]
 (def
-  ^{:doc "twitter oauth credentials"
+  ^{:doc "[app-key app-secret user-token user-token-secret]"
     :private true}
-  creds (if (.exists (io/file "/tmp/creds"))
-          (apply oauth/make-oauth-creds (read-string (slurp "/tmp/creds")))))
+  twitter-creds (if (.exists (io/file "/tmp/creds"))
+                  (apply oauth/make-oauth-creds
+                         (read-string (slurp "/tmp/creds")))))
 
 (defn ^:private handle
   "Process a chunk of async tweetness"
@@ -26,14 +26,16 @@
   "Invoke a twitter-api streaming connection for a comma-delimited
    statuses filter string"
   [filter handler]
-  (if-not creds (throw (Exception. "Missing /tmp/creds")))
-  (let [callback (AsyncStreamingCallback. (handle handler)
-                                          (comp println handler/response-return-everything)
-                                          handler/exception-print)]
+  (if-not twitter-creds (throw (Exception. "Missing /tmp/creds")))
+  (let [callback (AsyncStreamingCallback.
+                  (handle handler)
+                  (comp println handler/response-return-everything)
+                  handler/exception-print)]
     (stream/statuses-filter :params {:track filter}
-                            :client (ac/create-client :request-timeout -1) ; TODO: not this
-                            :oauth-creds creds
+                            :client (ac/create-client :request-timeout -1)
+                            :oauth-creds twitter-creds
                             :callbacks callback)))
+
 (defn close
   [stream]
   (if stream ((:cancel (meta stream)))))

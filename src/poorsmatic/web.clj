@@ -1,7 +1,7 @@
 (ns poorsmatic.web
-  (:use [hiccup core form element middleware]
-        [compojure.core :only [GET POST defroutes]]
+  (:use [compojure.core :only [GET POST defroutes]]
         [compojure.handler :only [site]]
+        [hiccup core form element middleware]
         [ring.util.response :only [redirect]])
   (:require [poorsmatic.models :as model]
             [poorsmatic.config :as config]
@@ -19,7 +19,7 @@
    [:ul
     (for [term (model/get-all-terms)]
       [:li
-       [:span.term term]
+       [:b term]
        (form-to [:post (str "/delete/" term)] (submit-button "delete"))
        [:table
         (for [[url title count] (model/find-urls-by-term term)]

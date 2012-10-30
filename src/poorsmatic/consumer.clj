@@ -30,7 +30,7 @@
   [endpoint]
   (let [scraper  (atom nil)
         callback (make-observer scraper)]
-    (callback (model/get-all-terms))
+    (callback (model/get-terms))
     [(cfg/observe callback)
      (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)]))
 

@@ -22,7 +22,7 @@
   [term]
   (delete terms (where (= :term (str/lower-case term)))))
 
-(defn get-all-terms
+(defn get-terms
   []
   (map :term (select terms)))
 

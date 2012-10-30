@@ -24,7 +24,7 @@
                           (str/lower-case term)))]
     (transact conn [[:db.fn/retractEntity tid]])))
 
-(defn get-all-terms
+(defn get-terms
   []
   (->> (q '[:find ?term ?t :in $ :where
             [?t :tweet/term ?term]] (db conn))

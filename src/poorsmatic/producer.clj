@@ -36,7 +36,7 @@
        (start [_]
          (log/info "Starting tweets service")
          (let [callback (make-observer tweets (url-extractor handler))]
-           (callback (model/get-all-terms))
+           (callback (model/get-terms))
            (reset! configurator (cfg/observe callback))))
        (stop [_]
          (cfg/ignore @configurator)

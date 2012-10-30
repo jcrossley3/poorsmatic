@@ -17,7 +17,7 @@
             (text-field "term")
             (submit-button "add"))
    [:ul
-    (for [term (model/get-all-terms)]
+    (for [term (model/get-terms)]
       [:li
        [:b term]
        (form-to [:post (str "/delete/" term)] (submit-button "delete"))
@@ -28,13 +28,13 @@
 (defn add
   [term]
   (xa/transaction
-   (config/notify (conj (model/get-all-terms) term))
+   (config/notify (conj (model/get-terms) term))
    (model/add-term term)))
 
 (defn delete
   [term]
   (xa/transaction
-   (config/notify (remove #{term} (model/get-all-terms)))
+   (config/notify (remove #{term} (model/get-terms)))
    (model/delete-term term)))
 
 (defroutes routes

@@ -1,21 +1,20 @@
 (ns poorsmatic.config
-  (:require [poorsmatic.models :as model]
-            [immutant.messaging :as msg]))
+  (:require [immutant.messaging :as msg]))
 
-(def config-endpoint "/topic/config")
+(def topic "/topic/config")
 
 (defn notify
-  []
-  (msg/publish config-endpoint (model/get-all-terms)))
+  [v]
+  (msg/publish topic v))
 
 (defn observe
   [f]
-  (msg/listen config-endpoint f))
+  (msg/listen topic f))
 
 (defn ignore
   [observer]
   (msg/unlisten observer))
 
-(defn start [] (msg/start config-endpoint))
-(defn stop [] (msg/stop config-endpoint :force true))
+(defn start [] (msg/start topic))
+(defn stop [] (msg/stop topic :force true))
 

@@ -28,14 +28,14 @@
 (defn add
   [term]
   (xa/transaction
-   (model/add-term term)
-   (config/notify)))
+   (config/notify (conj (model/get-all-terms) term))
+   (model/add-term term)))
 
 (defn delete
   [term]
   (xa/transaction
-   (model/delete-term term)
-   (config/notify)))
+   (config/notify (remove #{term} (model/get-all-terms)))
+   (model/delete-term term)))
 
 (defroutes routes
   (GET "/" [] (home))

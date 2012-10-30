@@ -22,8 +22,8 @@
 (defn stop
   "Cleanly shutdown everything "
   [{:keys [scraper daemon]}]
-  (.stop daemon)
-  (consumer/stop scraper)
+  (if daemon (.stop daemon))
+  (if scraper (consumer/stop scraper))
   (web/stop)
   (cfg/stop)
   (msg/stop urls :force true))

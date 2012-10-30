@@ -3,7 +3,8 @@
             [clojure.string :as str]
             [immutant.daemons :as dmn]
             [poorsmatic.config :as cfg]
-            [poorsmatic.twitter :as twitter]))
+            [poorsmatic.twitter :as twitter]
+            [poorsmatic.models :as model]))
 
 (defn url-extractor
   "Returns a function that parses a tweet for a URL and, if found,
@@ -15,30 +16,29 @@
       (handler url))))
 
 (defn ^:private make-observer
-  "Respond to configuration changes (new search terms)"
+  "Return a function that responds to configuration changes"
   [stream handler]
   (fn [terms]
-    (let [filter (str/join "," terms)
-          old @stream]
+    (let [filter (str/join "," terms)]
       (log/info "Tweets filter:" filter)
+      (twitter/close @stream)
       (reset! stream (if (not-empty terms)
-                       (twitter/filter-tweets filter handler)))
-      (twitter/close old))))
+                       (twitter/filter-tweets filter handler))))))
 
 (defn daemon
   "Start service that filters tweets for urls"
   [handler]
   (let [tweets (atom nil)
-        configurator (atom nil)
-        extractor (url-extractor handler)]
+        configurator (atom nil)]
     (dmn/daemonize
      "tweet-urls"
      (reify dmn/Daemon
        (start [_]
          (log/info "Starting tweets service")
-         (reset! configurator (cfg/observe (make-observer tweets extractor)))
-         (cfg/notify))
+         (let [callback (make-observer tweets (url-extractor handler))]
+           (callback (model/get-all-terms))
+           (reset! configurator (cfg/observe callback))))
        (stop [_]
-         (twitter/close @tweets)
          (cfg/ignore @configurator)
+         (twitter/close @tweets)
          (log/info "Stopped tweets service"))))))

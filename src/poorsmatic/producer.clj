@@ -6,7 +6,7 @@
             [poorsmatic.twitter :as twitter]
             [poorsmatic.models :as model]))
 
-(defn url-extractor
+(defn ^:private url-extractor
   "Returns a function that parses a tweet for a URL and, if found,
    invokes handler with it"
   [handler]

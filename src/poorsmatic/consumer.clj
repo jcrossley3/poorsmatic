@@ -5,7 +5,7 @@
             [poorsmatic.config :as cfg]
             [immutant.messaging :as msg]))
 
-(defn make-scraper
+(defn ^:private make-scraper
   "Returns a function that, given a url, counts the number of words in
    its content, among other things"
   [word]
@@ -16,7 +16,7 @@
         (when (> (:count v) 0)
           (model/add-url (assoc v :term word)))))))
 
-(defn make-observer
+(defn ^:private make-observer
   "Return a function that responds to configuration changes"
   [scraper]
   (fn [terms]

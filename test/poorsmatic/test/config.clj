@@ -4,11 +4,12 @@
 
 (deftest ^:integration config-notification
   (start)
-  (let [p (promise)]
+  (let [p (promise)
+        o (observe (fn [terms] (deliver p terms)))]
     (try
-      (observe (fn [terms] (deliver p terms)))
       (notify :success)
       (is (= :success (deref p 1000 :fail)))
       (finally
+       (ignore o)
        (stop)))))
 

@@ -16,5 +16,5 @@
   (msg/unlisten observer))
 
 (defn start [] (msg/start topic))
-(defn stop [] (msg/stop topic :force true))
+(defn stop [] (msg/stop topic))
 

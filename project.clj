@@ -7,7 +7,7 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [org.immutant/immutant "0.5.0"]
                  [clj-http "0.5.5"]
-                 [twitter-api "0.6.11"]
+                 [twitter-api "0.6.12"]
                  [org.clojars.jcrossley3/korma "1.0.0-SNAPSHOT"
                   :exclusions [[org.clojure/java.jdbc]]]
                  [lobos "1.0.0-SNAPSHOT"

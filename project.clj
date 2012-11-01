@@ -9,7 +9,7 @@
                  [clj-http "0.5.5"]
                  [com.datomic/datomic-free "0.8.3551"
                   :exclusions [postgresql]]
-                 [twitter-api "0.6.11"]
+                 [twitter-api "0.6.12"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
   :profiles {:dev {:immutant {:swank-port 4005}

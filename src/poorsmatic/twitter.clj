@@ -3,8 +3,7 @@
             [clojure.java.io :as io]
             [twitter.oauth :as oauth]
             [twitter.callbacks.handlers :as handler]
-            [twitter.api.streaming :as stream]
-            [http.async.client :as ac])
+            [twitter.api.streaming :as stream])
   (:import twitter.callbacks.protocols.AsyncStreamingCallback))
 
 (def
@@ -32,7 +31,6 @@
                   (comp println handler/response-return-everything)
                   handler/exception-print)]
     (stream/statuses-filter :params {:track filter}
-                            :client (ac/create-client :request-timeout -1)
                             :oauth-creds twitter-creds
                             :callbacks callback)))
 

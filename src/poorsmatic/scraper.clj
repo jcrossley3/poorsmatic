@@ -1,5 +1,5 @@
 (ns poorsmatic.scraper
-  (:require [clj-http.client :as client]
+  (:require [poorpus.http :as client]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
             [immutant.cache :as cache]))

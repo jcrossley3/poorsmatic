@@ -3,8 +3,8 @@
             [clojure.string :as str]
             [immutant.daemons :as dmn]
             [poorsmatic.config :as cfg]
-            [poorsmatic.twitter :as twitter]
-            [poorsmatic.models :as model]))
+            [poorsmatic.models :as model]
+            [poorpus.twitter :as twitter]))
 
 (defn ^:private url-extractor
   "Returns a function that parses a tweet for a URL and, if found,

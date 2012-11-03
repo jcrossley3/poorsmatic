@@ -37,5 +37,5 @@
 (defn stop
   "Cleanly shutdown the return value of start"
   [[config listener]]
-  (cfg/ignore config)
+  (cfg/dispose config)
   (msg/unlisten listener))

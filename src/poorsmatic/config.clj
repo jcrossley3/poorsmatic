@@ -3,15 +3,18 @@
 
 (def topic "/topic/config")
 
-(defn notify
-  [v]
-  (msg/publish topic v))
-
 (defn observe
-  [f]
-  (msg/listen topic f))
+  "Register a callback"
+  [callback]
+  (msg/listen topic callback))
 
-(defn ignore
+(defn notify
+  "Send all observers the new configuration"
+  [cfg]
+  (msg/publish topic cfg))
+
+(defn dispose
+  "De-register the observer"
   [observer]
   (msg/unlisten observer))
 

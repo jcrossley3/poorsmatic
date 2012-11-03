@@ -39,6 +39,6 @@
            (callback (model/get-terms))
            (reset! configurator (cfg/observe callback))))
        (stop [_]
-         (cfg/ignore @configurator)
+         (cfg/dispose @configurator)
          (twitter/close @tweets)
          (log/info "Stopped tweets service"))))))

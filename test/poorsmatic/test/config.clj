@@ -10,6 +10,6 @@
       (notify :success)
       (is (= :success (deref p 1000 :fail)))
       (finally
-       (ignore o)
+       (dispose o)
        (stop)))))
 

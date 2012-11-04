@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.immutant/immutant "0.6.0-SNAPSHOT"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.clojars.jcrossley3/poorpus "0.1.0"]
+                 [org.clojars.jcrossley3/poorpus "0.1.1-SNAPSHOT"]
                  [compojure "1.1.3"]
                  [com.datomic/datomic-free "0.8.3551"
                   :exclusions [org.apache.httpcomponents/httpclient]]

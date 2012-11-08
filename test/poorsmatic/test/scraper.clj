@@ -1,6 +1,6 @@
-(ns poorsmatic.test.scrape
+(ns poorsmatic.test.scraper
   (:use clojure.test
-        poorsmatic.scrape))
+        poorsmatic.scraper))
 
 (deftest count-word-matches
   (let [count-foo (counter "foo")

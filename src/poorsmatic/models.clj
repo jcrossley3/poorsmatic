@@ -1,7 +1,7 @@
 (ns poorsmatic.models
   (:require lobos.config
             [clojure.string :as str]
-            [immutant.utilities :as util])
+            [immutant.util :as util])
   (:use [korma db core]
         [immutant.xa :only [datasource]]))
 

@@ -1,38 +1,34 @@
 (ns poorsmatic.models
   (:require [clojure.string :as str]
-            [clojure.java.io :as io])
-  (:use [datomic.api :only (q db transact) :as d]
-        [immutant.registry :only (fetch)]))
+            [clojure.java.io :as io]
+            [immutant.registry :as registry])
+  (:use [datomic.api :only (q db transact) :as d]))
 
-(when-let [uri (:datomic-uri (fetch :project))]
+(when-let [uri (:datomic-uri (registry/get :project))]
   (d/create-database uri)
   (defonce conn (d/connect uri))
   (transact conn (read-string (slurp (io/resource "schema.dtm")))))
 
-(defn add-term
-  [term]
+(defn add-term [term]
   (d/transact
    conn
    [{:db/id #db/id [:db.part/user]
      :tweet/term (str/lower-case term)}]))
 
-(defn delete-term
-  [term]
+(defn delete-term [term]
   (if-let [tid (ffirst (q '[:find ?e :in $ ?term :where
                             [?e :tweet/term ?term]]
                           (db conn)
                           (str/lower-case term)))]
     (transact conn [[:db.fn/retractEntity tid]])))
 
-(defn get-terms
-  []
+(defn get-terms []
   (->> (q '[:find ?term ?t :in $ :where
             [?t :tweet/term ?term]] (db conn))
        (sort-by last)
        (map first)))
 
-(defn add-url
-  [{:keys [term url title count]}]
+(defn add-url [{:keys [term url title count]}]
   (let [count-id (d/tempid :db.part/user)
         base-url {:db/id #db/id [:db.part/user]
                   :url/term count-id
@@ -50,8 +46,7 @@
           (assoc base-url :url/title title)
           base-url))])))
 
-(defn find-urls-by-term
-  [term]
+(defn find-urls-by-term [term]
   (->> (q '[:find ?url ?title ?count
             :in $ ?term
             :where

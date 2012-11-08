@@ -39,10 +39,18 @@
 
 (defroutes routes
   (GET "/" [] (home))
-  (POST "/add" [term] (add term) (redirect "."))
-  (POST "/delete/:term" [term] (delete term) (redirect "..")))
+  (POST "/add" [term]
+        (add term)
+        (redirect "."))
+  (POST "/delete/:term" [term]
+        (delete term)
+        (redirect "..")))
 (def app (-> (site routes) (wrap-base-url)))
 
-(defn start [] (web/start #'app :reload true))
-(defn stop [] (web/stop))
+(defn start [] 
+  (config/start)
+  (web/start #'app))
 
+(defn stop [] 
+  (web/stop)
+  (config/stop))

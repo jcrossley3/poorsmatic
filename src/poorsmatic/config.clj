@@ -20,4 +20,3 @@
 
 (defn start [] (msg/start topic))
 (defn stop [] (msg/stop topic))
-

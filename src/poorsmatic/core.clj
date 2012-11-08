@@ -1,29 +1,31 @@
 (ns poorsmatic.core
   (:require [poorsmatic
              [web :as web]
-             [config :as cfg]
-             [producer :as producer]
-             [consumer :as consumer]]
+             [twitter :as producer]
+             [scraper :as consumer]]
             [immutant.messaging :as msg]))
 
 (def urls "/queue/urls")
+(def application (atom nil))
 
 (defn start
   "Start up everything"
   []
-  (msg/start urls)
-  (cfg/start)
-  (web/start)
-  {:scraper
-   (consumer/start urls)
-   :daemon
-   (producer/daemon #(msg/publish urls %))})
+  (when-not @application
+    (msg/start urls)
+    (web/start)
+    (reset! application
+            {:scraper
+             (consumer/start urls)
+             :daemon
+             (producer/daemon #(msg/publish urls %))})))
 
 (defn stop
   "Cleanly shutdown everything "
-  [{:keys [scraper daemon]}]
-  (if daemon (.stop daemon))
-  (if scraper (consumer/stop scraper))
-  (web/stop)
-  (cfg/stop)
-  (msg/stop urls :force true))
+  []
+  (when @application
+    (.stop (:daemon @application))
+    (consumer/stop (:scraper @application))
+    (web/stop)
+    (msg/stop urls)
+    (reset! application nil)))

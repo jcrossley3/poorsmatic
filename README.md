@@ -1,6 +1,10 @@
-# poorsmatic
+# Poorsmatic
 
-A Clojure library designed to ... well, that part is up to you.
+Demo app for Jim Crossley's "Immutant, I am in you!" talk at
+Clojure/conj 2012, the slides for which are in the doc folder.
+
+The talk featured Datomic as the application's persistent store, but
+there is also a branch using lobos/korma/h2 in here.
 
 To make it work, you'll need a file named `twitter-creds` available
 from the classpath, e.g. in the `resources/` directory. It should
@@ -16,6 +20,6 @@ FIXME
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Jim Crossley
 
 Distributed under the Eclipse Public License, the same as Clojure.

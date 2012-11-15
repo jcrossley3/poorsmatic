@@ -1,15 +1,15 @@
 # poorsmatic
 
+Demo app for Jim Crossley's "Immutant, I am in you!" talk at
+Clojure/conj 2012, the slides for which are in the doc folder.
 
+The talk featured Datomic as the application's persistent store, but
+there is also a branch using lobos/korma/h2 in here.
 
 ## Usage
 
-You'll need a transactor. Download [datomic free](http://downloads.datomic.com/0.8.3551/datomic-free-0.8.3551.zip), unzip it, then run:
-
-    ./bin/transactor config/samples/free-transactor-template.properties
-
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Jim Crossley
 
 Distributed under the Eclipse Public License, the same as Clojure.

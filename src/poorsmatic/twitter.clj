@@ -11,16 +11,15 @@
             [poorsmatic.models :as model])
   (:import twitter.callbacks.protocols.AsyncStreamingCallback))
 
-(def twitter-creds-format "[app-key app-secret user-token user-token-secret]")
+(def twitter-creds-format "[\"app-key\" \"app-secret\" \"user-token\" \"user-token-secret\"]")
 
 (def
   ^{:doc (str "Twitter creds format=" twitter-creds-format)
     :private true}
-  twitter-creds (if-let [creds (or (io/resource "twitter-creds")
-                                   (io/file "/tmp/twitter-creds"))]
+  twitter-creds (if-let [creds (io/resource "twitter-creds")]
                   (apply oauth/make-oauth-creds (read-string (slurp creds)))
                   (throw (Exception. (str "Missing 'twitter-creds' resource. "
-                                          "Required format, including square brackets: "
+                                          "Required format, including brackets and quotes: "
                                           twitter-creds-format)))))
 
 (defn ^:private handle

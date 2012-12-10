@@ -1,13 +1,20 @@
 (ns poorsmatic.models
   (:require lobos.config
             [clojure.string :as str]
-            [immutant.util :as util])
+            [immutant.util :as util]
+            [immutant.registry :as registry])
   (:use [korma db core]
         [immutant.xa :only [datasource]]))
 
 (when (util/in-immutant?)
-  (defonce ds (datasource "demo" {:adapter "h2" :database lobos.config/connection-url}))
-  (defdb prod {:datasource ds}))
+  (if-let [spec (:db-spec (registry/get :project))]
+    (let [spec (if (:name spec)
+                 spec
+                 {:datasource (datasource "poorsmatic"
+                                          (assoc spec
+                                            :adapter (:subprotocol spec)
+                                            :database (:subname spec)))})]
+      (defdb db spec))))
 
 (defentity urls)
 (defentity terms)

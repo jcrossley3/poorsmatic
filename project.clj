@@ -14,5 +14,10 @@
                  [com.h2database/h2 "1.3.160"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :profiles {:dev {:immutant {:swank-port 4005}}
-             :prod {:immutant {:init poorsmatic.core/start}}})
+  :profiles {:dev {:immutant {:swank-port 4005}
+                   :db-spec {:name "java:jboss/datasources/ExampleDS"
+                             :subprotocol "h2"}}
+             :prod {:immutant {:init poorsmatic.core/start}
+                    :db-spec {:classname "org.h2.Driver"
+                              :subprotocol "h2"
+                              :subname "file:/tmp/poorsmatic;MVCC=TRUE;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}}})

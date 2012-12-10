@@ -14,5 +14,5 @@
 (binding [*src-directory* (util/app-relative "src/")]
   (migrate))
 
-;;; Redeploy won't close the lobos global connection
-(close-global)
+;;; Close the lobos global connection when app undeploys
+(util/at-exit #(close-global))

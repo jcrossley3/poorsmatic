@@ -10,5 +10,4 @@
 (binding [*src-directory* (util/app-relative "src/")]
   (migrate))
 
-;;; Close the lobos global connection when app undeploys
 (close-global)

@@ -10,10 +10,7 @@
   (if-let [spec (:db-spec (registry/get :project))]
     (let [spec (if (:name spec)
                  spec
-                 {:datasource (datasource "poorsmatic"
-                                          (assoc spec
-                                            :adapter (:subprotocol spec)
-                                            :database (:subname spec)))})]
+                 {:datasource (datasource "poorsmatic" spec)})]
       (defdb db spec))))
 
 (defentity urls)

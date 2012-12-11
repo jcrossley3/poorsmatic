@@ -1,5 +1,6 @@
 (ns poorsmatic.web
-  (:use [compojure.core :only [GET POST defroutes]]
+  (:use [compojure.core :only [GET POST ANY defroutes]]
+        [compojure.route :only [not-found]]
         [compojure.handler :only [site]]
         [hiccup core form element middleware]
         [ring.util.response :only [redirect]])
@@ -44,7 +45,9 @@
         (redirect "."))
   (POST "/delete/:term" [term]
         (delete term)
-        (redirect "..")))
+        (redirect ".."))
+  (ANY "*" [] (not-found "<h1>Page Not Found</h1>")))
+
 (def app (-> (site routes) (wrap-base-url)))
 
 (defn start [] 

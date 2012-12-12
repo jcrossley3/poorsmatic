@@ -20,4 +20,7 @@
              :prod {:immutant {:init poorsmatic.core/start}
                     :db-spec {:classname "org.h2.Driver"
                               :subprotocol "h2"
-                              :subname "file:/tmp/poorsmatic;MVCC=TRUE;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}}})
+                              :subname "file:/tmp/poorsmatic;MVCC=TRUE;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}}
+             :openshift {:immutant {:init poorsmatic.core/start}
+                         :db-spec  {:name "java:jboss/datasources/PostgreSQLDS"
+                                    :subprotocol "postgresql"}}})

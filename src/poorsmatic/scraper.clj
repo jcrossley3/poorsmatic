@@ -4,8 +4,10 @@
             [clj-http.client :as http]
             [poorsmatic.models :as model]
             [poorsmatic.config :as cfg]
-            [immutant.messaging :as msg]
             [immutant.cache :as cache]))
+
+(def terms "The currently active terms"
+  (atom nil))
 
 (defn fetch*
   "Returns a hashed response given a url"
@@ -14,53 +16,41 @@
     (log/info "Fetching" url)
     (time (http/get url {:socket-timeout 10000 :conn-timeout 10000}))
     (catch Exception e (log/warn (.getMessage e)) {})))
-(def fetch (cache/memo fetch* "scrape" :idle 10))
+(def fetch-url (cache/memo fetch* "scrape" :idle 10))
 
-(defn counter
-  "Adds a :count to the response"
-  [word]
-  (fn [m]
-    (assoc m :count (-> (str/lower-case (:body m ""))
-                        (str/split #"[^\w]+")
-                        frequencies
-                        (get (str/lower-case word) 0)))))
+(defn attach-counts 
+  "Adds counts for each word in @terms under :word-counts"
+  [content]
+  (println "COUNTING:" (:url content))
+  (reduce (fn [{:keys [body] :as content} word]
+            (assoc-in content [:word-counts word]
+                      (-> (str/lower-case (or body ""))
+                          (str/split #"[^\w]+")
+                          frequencies
+                          (get (str/lower-case word) 0))))
+          content @terms))
 
-(defn title
-  "Adds a :title to the response"
-  [m]
-  (assoc m :title (last (re-find #"<title>(.*?)</title>" (:body m "")))))
-
-(defn url
+(defn attach-resolved-url
   "Adds a :url to the response"
   [m]
   (assoc m :url (last (:trace-redirects m))))
 
-(defn save-url-for
-  "Returns a function that, given a url, counts the number of words in
-   its content, and saves the url if count > 0"
-  [word]
-  (let [scrape (comp (counter word) title url fetch)]
-    (fn [url]
-      (let [v (scrape url)]
-        (log/info word "=>" (:count v))
-        (when (> (:count v) 0)
-          (model/add-url (assoc v :term word)))))))
+(defn attach-title
+  "Adds a :title to the response"
+  [m]
+  (println "TITLEING:" (:url m))
+  (assoc m :title (last (re-find #"<title>(.*?)</title>" (:body m "")))))
+
 
 (defn start
   "Scrape urls looking for words received from the config topic"
-  [endpoint]
-  (let [scraper  (atom nil)
-        reconfigure (fn [terms]
-                      (reset! scraper
-                              (if (empty? terms)
-                                (constantly nil)
-                                (apply juxt (map save-url-for terms)))))]
+  []
+  (let [reconfigure (fn [t]
+                      (reset! terms t))]
     (reconfigure (model/get-terms))
-    [(cfg/observe reconfigure)
-     (msg/listen endpoint (fn [url] (@scraper url)) :concurrency 10)]))
+    (cfg/observe reconfigure)))
 
 (defn stop
   "Cleanly shutdown the return value of start"
-  [[config listener]]
-  (cfg/dispose config)
-  (msg/unlisten listener))
+  [config]
+  (cfg/dispose config))

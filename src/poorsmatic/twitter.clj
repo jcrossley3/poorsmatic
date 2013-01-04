@@ -47,14 +47,12 @@
   [stream]
   (if stream ((:cancel (meta stream)))))
 
-(defn url-extractor
-  "Returns a function that parses a tweet for a URL and, if found,
-   invokes handler with it"
-  [handler]
-  (fn [{text :text}]
-    (when-let [url (and text (re-find #"http://[\w/.-]+" text))]
-      (log/info text)
-      (handler url))))
+(defn attach-urls
+  "Parses a tweet for a URLs and, if found, adds them to the tweet."
+  [{text :text :as tweet}]
+  ;(log/info text)
+  (assoc tweet
+    :content-urls (and text (re-seq #"http://[\w/.-]+" text))))
 
 (defn reconnect
   "Return a function that responds to configuration changes"
@@ -74,7 +72,7 @@
         configurator (atom nil)
         start (fn []
                 (log/info "Starting tweets service")
-                (let [reconfigure (reconnect tweets (url-extractor handler))]
+                (let [reconfigure (reconnect tweets handler)]
                   (reconfigure (model/get-terms))
                   (reset! configurator (cfg/observe reconfigure))))
         stop  (fn []

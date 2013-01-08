@@ -37,3 +37,7 @@
           (where (= :term (str/lower-case term)))
           (limit 10)
           (order :count :DESC)))
+
+(defn clear []
+  (delete urls)
+  (delete terms))

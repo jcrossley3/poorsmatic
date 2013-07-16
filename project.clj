@@ -5,7 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.immutant/immutant "0.6.0-SNAPSHOT"]
                  [clj-http "0.5.5"]
                  [com.datomic/datomic-free "0.8.3551"
                   :exclusions [postgresql]]

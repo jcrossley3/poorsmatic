@@ -23,7 +23,7 @@
        [:b term]
        (form-to [:post (str "/delete/" term)] (submit-button "delete"))
        [:table
-        (for [[url title count] (model/find-urls-by-term term)]
+        (for [{:keys [url title count]} (model/find-urls-by-term term)]
           [:tr [:td count] [:td (link-to url (or title url))]])]])]))
 
 (defn add

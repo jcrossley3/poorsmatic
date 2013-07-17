@@ -6,12 +6,18 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.logging "0.2.3"]
                  [clj-http "0.5.5"]
-                 [com.datomic/datomic-free "0.8.3551"
-                  :exclusions [postgresql]]
                  [twitter-api "0.6.12"]
+                 [korma "0.3.0-RC2"]
+                 [lobos "1.0.0-SNAPSHOT"]
+                 [com.h2database/h2 "1.3.160"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :profiles {:dev {:immutant {:swank-port 4005}
-                   :datomic-uri "datomic:mem://poorsmatic"}
+  :profiles {:dev {:db-spec {:database "mem:poo"
+                             :adapter "h2"}}
              :prod {:immutant {:init poorsmatic.core/start}
-                    :datomic-uri "datomic:free://localhost:4334/poorsmatic"}})
+                    :db-spec {:classname "org.h2.Driver"
+                              :subprotocol "h2"
+                              :subname "file:/tmp/poorsmatic;MVCC=TRUE;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE"}}
+             :openshift {:immutant {:init poorsmatic.core/start}
+                         :db-spec  {:name "java:jboss/datasources/PostgreSQLDS"
+                                    :subprotocol "postgresql"}}})

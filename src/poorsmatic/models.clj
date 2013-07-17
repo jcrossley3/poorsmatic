@@ -1,61 +1,33 @@
 (ns poorsmatic.models
-  (:require [clojure.string :as str]
-            [clojure.java.io :as io]
-            [immutant.registry :as registry])
-  (:use [datomic.api :only (q db transact) :as d]))
+  (:require lobos.config
+            [clojure.string :as str]
+            [immutant.util :as util])
+  (:use [korma db core]))
 
-(when-let [uri (:datomic-uri (registry/get :project))]
-  (d/create-database uri)
-  (defonce conn (d/connect uri))
-  (transact conn (read-string (slurp (io/resource "schema.dtm")))))
+(when (util/in-immutant?)
+  (defdb db lobos.config/db-spec))
+
+(defentity urls)
+(defentity terms)
 
 (defn add-term [term]
-  (d/transact
-   conn
-   [{:db/id #db/id [:db.part/user]
-     :tweet/term (str/lower-case term)}]))
+  (let [t (str/lower-case term)]
+    (if (empty? (select terms (where (= :term t))))
+      (insert terms (values {:term t})))))
 
 (defn delete-term [term]
-  (if-let [tid (ffirst (q '[:find ?e :in $ ?term :where
-                            [?e :tweet/term ?term]]
-                          (db conn)
-                          (str/lower-case term)))]
-    (transact conn [[:db.fn/retractEntity tid]])))
+  (delete terms (where (= :term (str/lower-case term)))))
 
 (defn get-terms []
-  (->> (q '[:find ?term ?t :in $ :where
-            [?t :tweet/term ?term]] (db conn))
-       (sort-by last)
-       (map first)))
+  (map :term (select terms)))
 
-(defn add-url [{:keys [term url title count]}]
-  (let [count-id (d/tempid :db.part/user)
-        base-url {:db/id #db/id [:db.part/user]
-                  :url/term count-id
-                  :url/url url}]
-    (transact
-     conn
-     [{:db/id count-id
-       :term-count/term (str/lower-case term)
-       :term-count/count count}
-      (if-let [url-id (ffirst
-                       (q '[:find ?e :in $ ?url :where [?e :url/url ?url]]
-                          (db conn) url))]
-        {:db/id url-id :url/term count-id}
-        (if title
-          (assoc base-url :url/title title)
-          base-url))])))
+(defn add-url [attrs]
+  (if (empty? (select urls (where (and (= :url (:url attrs))
+                                       (= :term (:term attrs))))))
+    (insert urls (values (select-keys attrs [:term :url :title :count])))))
 
 (defn find-urls-by-term [term]
-  (->> (q '[:find ?url ?title ?count
-            :in $ ?term
-            :where
-            [?u :url/term ?t]
-            [?t :term-count/term ?term]
-            [?u :url/url ?url]
-            [?u :url/title ?title]
-            [?t :term-count/count ?count]]
-          (db conn)
-          (str/lower-case term))
-       (sort-by #(nth % 2) >)
-       (take 10)))
+  (select urls
+          (where (= :term (str/lower-case term)))
+          (limit 10)
+          (order :count :DESC)))

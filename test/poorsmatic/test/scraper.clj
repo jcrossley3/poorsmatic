@@ -3,7 +3,7 @@
         poorsmatic.scraper))
 
 (deftest count-word-matches
-  (let [foo (counter "foo")
+  (let [count-foo (counter "foo")
         request {:body "a test for foo, Foo, or FOO, but not food"}]
-    (is (= 3 (:count (foo request))))))
+    (is (= 3 (:count (count-foo request))))))
 

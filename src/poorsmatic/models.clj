@@ -1,17 +1,11 @@
 (ns poorsmatic.models
   (:require lobos.config
             [clojure.string :as str]
-            [immutant.util :as util]
-            [immutant.registry :as registry])
-  (:use [korma db core]
-        [immutant.xa :only [datasource]]))
+            [immutant.util :as util])
+  (:use [korma db core]))
 
 (when (util/in-immutant?)
-  (if-let [spec (:db-spec (registry/get :project))]
-    (let [spec (if (:name spec)
-                 spec
-                 {:datasource (datasource "poorsmatic" spec)})]
-      (defdb db spec))))
+  (defdb db lobos.config/db-spec))
 
 (defentity urls)
 (defentity terms)

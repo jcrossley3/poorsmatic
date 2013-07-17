@@ -7,16 +7,13 @@
                  [org.clojure/tools.logging "0.2.3"]
                  [clj-http "0.5.5"]
                  [twitter-api "0.6.12"]
-                 [org.clojars.jcrossley3/korma "1.0.0-SNAPSHOT"
-                  :exclusions [[org.clojure/java.jdbc]]]
-                 [lobos "1.0.0-SNAPSHOT"
-                  :exclusions [[org.clojure/java.jdbc]]]
+                 [korma "0.3.0-RC2"]
+                 [lobos "1.0.0-SNAPSHOT"]
                  [com.h2database/h2 "1.3.160"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :profiles {:dev {:immutant {:swank-port 4005}
-                   :db-spec {:name "java:jboss/datasources/ExampleDS"
-                             :subprotocol "h2"}}
+  :profiles {:dev {:db-spec {:database "mem:poo"
+                             :adapter "h2"}}
              :prod {:immutant {:init poorsmatic.core/start}
                     :db-spec {:classname "org.h2.Driver"
                               :subprotocol "h2"

@@ -5,6 +5,7 @@
   (:use [korma db core]))
 
 (when (util/in-immutant?)
+  (println "JC:" lobos.config/db-spec)
   (defdb db lobos.config/db-spec))
 
 (defentity urls)

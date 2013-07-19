@@ -7,7 +7,7 @@
          [migration :only [*src-directory*]]]))
 
 (def db-spec (let [s (:db-spec (registry/get :project))]
-               {:datasource (or (wrap s) (datasource "poorsmatic" s))}))
+               (merge s {:datasource (or (wrap s) (datasource "poorsmatic" s))})))
 
 (open-global (merge {:subprotocol "h2"} db-spec))
 

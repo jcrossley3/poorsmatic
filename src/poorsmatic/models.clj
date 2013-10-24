@@ -2,12 +2,14 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [immutant.registry :as registry])
-  (:use [datomic.api :only (q db transact) :as d]))
+  (:use [datomic.api :only (q db transact) :as d]
+        [immutant.util :only (port)]))
 
-(when-let [uri (:datomic-uri (registry/get :project))]
+(let [uri (or (:datomic-uri (registry/get :project))
+              (str "datomic:inf://localhost:" (port :hotrod) "/poorsmatic"))]
   (d/create-database uri)
   (defonce conn (d/connect uri))
-  (transact conn (read-string (slurp (io/resource "schema.dtm")))))
+  @(transact conn (read-string (slurp (io/resource "schema.dtm")))))
 
 (defn add-term [term]
   (d/transact

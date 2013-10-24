@@ -11,5 +11,5 @@
                  [twitter-api "0.6.12"]
                  [compojure "1.1.3"]
                  [hiccup "1.0.1"]]
-  :profiles {:prod {:immutant {:init poorsmatic.core/start}}}
-  :datomic-uri "datomic:inf://localhost:11222/poorsmatic")
+  :profiles {:prod {:immutant {:init poorsmatic.core/start}}
+             :mem {:datomic-uri "datomic:mem://poorsmatic"}})

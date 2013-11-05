@@ -16,7 +16,7 @@
 (defn dispose
   "De-register the observer"
   [observer]
-  (msg/unlisten observer))
+  @(msg/unlisten observer))
 
 (defn start [] (msg/start topic))
 (defn stop [] (msg/stop topic))

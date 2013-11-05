@@ -6,10 +6,10 @@
         [immutant.util :only (port)]))
 
 (let [uri (or (:datomic-uri (registry/get :project))
-              (str "datomic:inf://localhost:" (port :hotrod) "/poorsmatic"))]
-  (d/create-database uri)
+              (format "datomic:inf://localhost:%d/poorsmatic" (port :hotrod)))
+      created (d/create-database uri)]
   (defonce conn (d/connect uri))
-  @(transact conn (read-string (slurp (io/resource "schema.dtm")))))
+  (if created @(transact conn (read-string (slurp (io/resource "schema.dtm"))))))
 
 (defn add-term [term]
   (d/transact
